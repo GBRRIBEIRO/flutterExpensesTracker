@@ -7,6 +7,7 @@ import 'package:personal_expenses/widgets/new_transaction.dart';
 import 'package:personal_expenses/widgets/transactions_list.dart';
 
 import './models/transaction.dart';
+import 'widgets/chart.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,10 +17,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Personal Expenses',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+          primarySwatch: Colors.purple,
+          accentColor: Colors.amber,
+          fontFamily: 'Quicksand',
+          appBarTheme: AppBarTheme(
+            textTheme: ThemeData.light().textTheme.copyWith(
+                    titleLarge: TextStyle(
+                  fontFamily: 'OpenSans',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                )),
+          )),
       home: MyHomePage(),
     );
   }
@@ -32,19 +42,30 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _userTransactions = [
-    Transaction(
-      id: '1',
-      title: 'Car',
-      value: 10000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: '2',
-      title: 'Drugs',
-      value: 1000,
-      date: DateTime.now(),
-    )
+    // Transaction(
+    //   id: '1',
+    //   title: 'Car',
+    //   value: 10000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: '2',
+    //   title: 'Drugs',
+    //   value: 1000,
+    //   date: DateTime.now(),
+    // )
   ];
+
+  List<Transaction> get _recentTransactions {
+    //'.where' methof returns a "new list" where the conditions met
+    //It's currently returning a list of the user transactions where the days are after 7 ago
+
+    return _userTransactions.where((tx) {
+      return tx.date.isAfter(DateTime.now().subtract(
+        Duration(days: 7),
+      ));
+    }).toList();
+  }
 
   void _addNewTransaction(String titleTx, double valueTx) {
     final newTx = Transaction(
@@ -71,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
     initializeDateFormatting();
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Flutter App'),
+        title: Text('Personal Expenses'),
         actions: <Widget>[
           IconButton(
             onPressed: () {
@@ -83,12 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: SingleChildScrollView(
         child: Column(children: [
-          Card(
-            child: Container(
-              child: Text('Chart'),
-              width: 100,
-            ),
-          ),
+          Chart(_recentTransactions),
           TransactionList(_userTransactions),
         ]),
       ),
